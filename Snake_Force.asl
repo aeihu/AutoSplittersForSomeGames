@@ -31,7 +31,7 @@ split
 reset
 {
     if (current.current_level == 0 && current.show){
-        vars.current_stage = 2;
+        vars.current_stage = 1;
         return true;
     }
 }

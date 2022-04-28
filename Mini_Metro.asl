@@ -16,7 +16,7 @@ startup
 	settings.Add("p100", true, "+100", "per_score_split");
 	settings.Add("p200", false, "+200", "per_score_split");
 	settings.Add("p300", false, "+300", "per_score_split");
-	settings.Add("is_loading", false, "Pause For Loading");
+	settings.Add("is_loading", false, "Pause for 'End-of-week'");
 }
 
 init

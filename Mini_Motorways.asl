@@ -57,9 +57,6 @@ start
 
 split
 {
-	print("per: " + vars.per.ToString());
-	print("state: " + current.state.ToString());
-	print("points: " + current.points.ToString());
 	if (current.points >= vars.per * vars.times){
 		vars.times += 1;
 		return true;

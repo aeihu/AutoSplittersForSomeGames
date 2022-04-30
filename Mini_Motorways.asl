@@ -1,5 +1,6 @@
 state("Mini Motorways")
 {
+    int state : "UnityPlayer.dll", 0x014656B4, 0x8, 0x368, 0x1C, 0x4, 0x88, 0x58, 0x9BC;
     int cityIndex : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0xC0;
     int cityDef : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0x108;
     int points : "UnityPlayer.dll", 0x01462590, 0x88, 0x70, 0x1C, 0xB4, 0x18, 0x104, 0x18;
@@ -16,15 +17,13 @@ startup
 
 init
 {
-    vars.current_stage = 0;
 	vars.times = 1;
 	vars.per = 0;
 }
 
 start
 {
-	if (current.cityDef != old.cityDef && old.cityDef == 0 && current.cityIndex < 100){
-		vars.current_stage = current.cityIndex;
+	if (current.cityDef != old.cityDef && old.cityDef == 0 && current.cityIndex > 1 && current.cityIndex < 100){
 		vars.times = 1;
 		vars.per = 0;
 		if (settings["per_score_split"]){
@@ -66,7 +65,7 @@ split
 
 reset
 {
-	if (vars.current_stage == old.cityIndex && current.cityIndex == 0){
+	if (current.state != old.state && current.state == 6){
 		return true;
 	}
 }

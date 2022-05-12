@@ -1,9 +1,10 @@
 state("Mini Motorways")
 {
-    int state : "UnityPlayer.dll", 0x01469AF0, 0x58, 0x1C, 0xC, 0x50, 0x20, 0xE4, 0x37C;
-    int cityIndex : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0xC0;
+    //int state : "UnityPlayer.dll", 0x01469AF0, 0x58, 0x1C, 0xC, 0x50, 0x20, 0xE4, 0x37C;
+    int cityIndex : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0xC4;
     int cityDef : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0x108;
     int points : "UnityPlayer.dll", 0x0142C480, 0x0, 0x44, 0x1C, 0x3C, 0x3C, 0x20, 0x14;
+    float tranIn : "UnityPlayer.dll", 0x0142B8D4, 0x8, 0x0, 0x1C, 0x1C, 0x34, 0x18, 0x74;
 }
 
 startup
@@ -19,6 +20,7 @@ init
 {
 	vars.times = 1;
 	vars.per = 0;
+	vars.reZero	= false;
 }
 
 start
@@ -26,6 +28,7 @@ start
 	if (current.cityDef != old.cityDef && old.cityDef == 0 && current.cityIndex > 1 && current.cityIndex < 100){
 		vars.times = 1;
 		vars.per = 0;
+		vars.reZero	= false;
 		if (settings["per_score_split"]){
 			if (settings["p50"]){
 				vars.per += 50;
@@ -57,15 +60,21 @@ start
 
 split
 {
-	if (current.points >= vars.per * vars.times){
-		vars.times += 1;
-		return true;
+	if (vars.reZero){
+		if (current.points >= vars.per * vars.times){
+			vars.times += 1;
+			return true;
+		}
+	}
+	else{
+		if (current.points == 0)
+			vars.reZero	= true;
 	}
 }
 
 reset
 {
-	if (current.state != old.state && current.state == 6){
+	if (current.tranIn >= 0.05f && current.tranIn <= 0.95f){
 		return true;
 	}
 }

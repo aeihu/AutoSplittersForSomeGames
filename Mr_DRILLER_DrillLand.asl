@@ -1,10 +1,11 @@
 state("DrillLand")
 {
-	byte result_ui : 0x002B3CC8, 0x130, 0x68, 0x930, 0xA8, 0x8, 0x88, 0x9B0;
+	byte result_ui : 0x002C67E8, 0x120, 0xB8, 0x880, 0x0, 0x0, 0x8, 0x6C0;
 	int main_ui : 0x002C74F0, 0x88, 0x50, 0x228, 0x220, 0x30, 0xA8, 0xEC8;
 	int title_ui : 0x002C74F0, 0x88, 0x50, 0x228, 0x220, 0x30, 0xA8, 0x1040;
 	byte gamestatus : 0x2B05CB; // 7FF69B6305C8
 	byte stage : 0x2B05A8; // 7FF69B6305A8
+	int between : 0x002B0570, 0x98, 0xB0, 0x208, 0x100, 0x680, 0x8, 0xFB0;
 	//byte select_charater_ui : 0x002B3CC8, 0x130, 0x68, 0x930, 0xA8, 0x8, 0x88, 0x9B1;
 	//byte guiwu_hp : 0x002B05D0, 0x18, 0x1C4, 0x8, 0x20, 0x8, 0x8, 0x608; 
 	//byte dixiacheng_hp : 0x002B0578, 0x0, 0x408, 0x38, 0x90, 0x8, 0x68, 0x598; 
@@ -53,18 +54,24 @@ split
 	}
 	
 	if (vars.boss && current.gamestatus == 0 && old.gamestatus == 1){
-		if (vars.boss_count < 2)
-			vars.boss_count += 1;
-		else{
+		if (current.between != 50){
+			if (vars.boss_count < 1){
+				vars.boss_count += 1;
+				//print("between: " + current.between.ToString() + " - " + vars.boss_count.ToString() + " - " + current.stage.ToString() + " - " + current.gamestatus.ToString());
+				//if (current.between == 50) 
+			}else{
+				vars.boss_count = 0;
+				return true;
+			}
+		}else{
 			vars.boss_count = 0;
-			return true;
 		}
 	}
 }
 
 reset
 {
-	if (current.title_ui == 65542 && vars.flag_reset){
+	if (current.title_ui == 65542 && vars.flag_reset && current.stage != 13){
 		vars.flag_reset = false;
 		return true;
 	}

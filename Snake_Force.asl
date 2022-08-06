@@ -9,21 +9,24 @@ state("Snake Force")
 
 init
 {
-    vars.current_stage = 1;
+    vars.is_running = true;
 }
 
 start
 {
     if (0 == current.current_level && current.brightness <= 0.0f && !current.show){
-        vars.current_stage = 1;
+		vars.is_running = true;
         return true;
     }
 }
 
 split
 {
-    if (vars.current_stage == current.current_level && current.state == 3){
-        vars.current_stage += 1; 
+	if (!vars.is_running && current.state == 1)
+		vars.is_running = true;
+		
+    if (vars.is_running && current.state == 3){
+		vars.is_running = false;
         return true;
     }
 }
@@ -31,7 +34,7 @@ split
 reset
 {
     if (current.current_level == 0 && current.show){
-        vars.current_stage = 1;
+		vars.is_running = true;
         return true;
     }
 }

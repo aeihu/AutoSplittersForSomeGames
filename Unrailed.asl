@@ -1,51 +1,63 @@
 state("UnrailedGame")
 {
+	//int gamemanager : "SDL2.dll", 0x001634F0, 0x408, 0x1D0, 0x88, 0x568, 0x1C0, 0x20, 0x40, 0x40, 0x10, 0x0; old
+	//IJ.aXE(Hm).aQi(Ie).awT(List<IE>).CgS(jb).BDU(NN).Cir(e<JZ>)
+    //int gamemanager : "SDL2.dll", 0x001634F0, 0x268, 0x78, 0x178, 0x128, 0xD0, 0xE8, 0x0;
+    //int gamemanager : "SDL2.dll", 0x001634F0, 0x268, 0x78, 0x178, 0x128, 0xD0, 0xE8, 0x0, 0xC0, 0x10, 0x20;
+    
 	byte running : "SDL2.dll", 0x00161FE0, 0x3C, 0x18, 0x30, 0x50, 0x8, 0x1FC, 0xF80;
 	byte g_status : "gameoverlayrenderer64.dll", 0x00169D58, 0x140, 0x98, 0xA8, 0x158, 0xE08, 0x1D0, 0x430, 0x68, 0x24C;
-	float s_bar : "libfmodstudio.dll", 0x00144CD8, 0x318, 0xF8, 0x30, 0x18, 0x10, 0x68, 0x8, 0x1E8, 0x2BC;
-	//byte loading_time : "SDL2.dll", 0x00161FE0, 0x3C, 0x18, 0x30, 0x50, 0x8, 0x1FC, 0xFAC;
-	
-	//int g_start : "SDL2.DLL", 0x00163C40, 0x8E0, 0xA0, 0x158, 0x90, 0x70, 0x168, 0xD70; //3103392971[5468] between: -1191574325 
-	//byte rail_complete : "SDL2.DLL", 0x00163C40, 0x840, 0x0, 0x8, 0x0, 0xEC, 0x8E8;
+	//byte rail_complete : "SDL2.dll", 0x00162C88, 0xE0, 0x18, 0x5B0, 0x230, 0x0, 0x18, 0x70, 0x60, 0x188, 0xD1;
+	//byte game_mode : "SDL2.dll", 0x00162E58, 0x1F8, 0x130, 0x20, 0x5B0, 0xAD8, 0x48, 0x28, 0x12C, 0x1C0, 0x30;
 }
 
 startup
 {
-
 }
 
 init
 {
-	vars.flag_complete = true;
+	vars.ticks = 0;
 }
-
 
 start
 {
-	print("start: " + current.g_status.ToString() + " - " + current.running.ToString());
-	if (current.g_status == 1){
+	if (current.g_status != old.g_status)
+		print("start: " + current.g_status.ToString() + " - " + old.g_status.ToString());
+	if (current.g_status == 1 && old.g_status == 3){
+		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 20;
 		return true;
 	}
 }
 
+update
+{
+}
+
 split
 {
-	print("split: " + current.g_status.ToString() + " - " + current.running.ToString() + " * " + current.s_bar.ToString());
-	if (vars.flag_complete){
-		if (current.s_bar < 0.00001)
-			vars.flag_complete = false;
-	}else{
-		if (current.s_bar > 0.99999){
-			vars.flag_complete = true;
-			return true;
-		}
+	//if (current.g_status != old.g_status)
+	//	print("g_status: " + current.g_status.ToString() + " - " + old.g_status.ToString());
+	
+	if (current.g_status == 1 && current.g_status != old.g_status && vars.ticks < (System.DateTime.Now.Ticks / 10000000)){
+		//print("split: " + current.g_status.ToString() + " - " + old.g_status.ToString() + " : " + vars.ticks.ToString() + " : " + (System.DateTime.Now.Ticks / 10000000).ToString());
+		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 20;
+		return true;
 	}
 }
 
 reset
 {
-	if (current.running == 0 && current.g_status != 1){
-		print("reset: " + current.g_status.ToString() + " - " + current.running.ToString());
+	if (current.running == 0 && old.running != current.running){
+		//print("reset: " + current.g_status.ToString() + " - " + old.g_status.ToString());
 		return true;
 	}
+}
+
+exit
+{
+}
+
+shutdown
+{
 }

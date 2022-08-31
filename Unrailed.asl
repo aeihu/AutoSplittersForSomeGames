@@ -36,11 +36,11 @@ update
 
 split
 {
-	//if (current.g_status != old.g_status)
-	//	print("g_status: " + current.g_status.ToString() + " - " + old.g_status.ToString());
+	if (current.g_status != old.g_status)
+		print("g_status: " + current.g_status.ToString() + " - " + old.g_status.ToString());
 	
 	if (current.g_status == 1 && current.g_status != old.g_status && vars.ticks < (System.DateTime.Now.Ticks / 10000000)){
-		//print("split: " + current.g_status.ToString() + " - " + old.g_status.ToString() + " : " + vars.ticks.ToString() + " : " + (System.DateTime.Now.Ticks / 10000000).ToString());
+		print("split: " + current.g_status.ToString() + " - " + old.g_status.ToString() + " : " + vars.ticks.ToString() + " : " + (System.DateTime.Now.Ticks / 10000000).ToString());
 		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 20;
 		return true;
 	}
@@ -49,15 +49,7 @@ split
 reset
 {
 	if (current.running == 0 && old.running != current.running){
-		//print("reset: " + current.g_status.ToString() + " - " + old.g_status.ToString());
+		print("reset: " + current.g_status.ToString() + " - " + old.g_status.ToString());
 		return true;
 	}
-}
-
-exit
-{
-}
-
-shutdown
-{
 }

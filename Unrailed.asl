@@ -46,7 +46,7 @@ start
 				var scanner = new SignatureScanner(game, mbi.BaseAddress, (int)mbi.RegionSize.ToUInt64());
 
 				var sig_state = new SigScanTarget(0x188, 
-					"?? ?? ?? BE FA 7F 00 00 ?? ?? ?? ?? ?? 0? 00 00 ?? ?? ?? ?? ?? 0? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 F9 00 00 00 00 01 01 00 00 00 00 00");
+					"?? ?? ?? ?? F? 7F 00 00 ?? ?? ?? ?? ?? 0? 00 00 ?? ?? ?? ?? ?? 0? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 F9 00 00 00 00 01 01 00 00 00 00 00");
 					
 				ptr = scanner.Scan(sig_state);
 
@@ -58,7 +58,7 @@ start
 				}
 				
 				sig_state = new SigScanTarget(0x188, 
-					"?? ?? ?? BE FA 7F 00 00 ?? ?? ?? ?? ?? 0? 00 00 ?? ?? ?? ?? ?? 0? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 FB 00 00 00 00 01 01 00 00 00 00 00");
+					"?? ?? ?? ?? F? 7F 00 00 ?? ?? ?? ?? ?? 0? 00 00 ?? ?? ?? ?? ?? 0? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 FB 00 00 00 00 01 01 00 00 00 00 00");
 					
 				ptr = scanner.Scan(sig_state);
 				
@@ -98,7 +98,7 @@ split
 				vars.ticks = System.DateTime.Now.Ticks / 10000000 + 15;
 				return true;
 			}
-		}else{;
+		}else{
 			if (vars.flag_sign){
 				//print("rail_complete: " + vars.rail_complete.Current.ToString());
 				return vars.rail_complete == null ? false : vars.rail_complete.Current;

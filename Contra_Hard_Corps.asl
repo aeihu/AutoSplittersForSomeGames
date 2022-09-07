@@ -23,6 +23,7 @@ init
 	vars.ticks = 0;
 	vars.stage_no = 1;
 	vars.route = 0;
+	vars.counter_for_lost_control = 0;
 }
 
 update
@@ -128,7 +129,8 @@ update
 		
 		if (vars.is_selecting){
 			if ((vars.flag_select.Changed && vars.flag_select.Current == 1) || (vars.is_talking.Changed && vars.is_talking.Current == 0)){
-				vars.route += (vars.route == 0 ? 1 : 10) * (vars.select_idx.Current + 1);
+				vars.route += (vars.route == 0 ? 10 : 1) * (vars.select_idx.Current + 1);
+				print("route: " + vars.route.ToString());
 				vars.is_selecting = false;
 			}
 		}
@@ -145,6 +147,7 @@ start
 		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 4;
 		vars.stage_no = 1;
 		vars.route = 0;
+		vars.counter_for_lost_control = 0;
 		vars.is_selecting = false;
 		return true;
 	}
@@ -155,6 +158,7 @@ split
 	if (vars.stage_clear != null){
 		if (vars.stage_clear.Changed && vars.stage_clear.Current == 1 && vars.ticks < (System.DateTime.Now.Ticks / 10000000)){
 			vars.stage_no += 1;
+			print("stage_no: " + vars.stage_no.ToString());
 			return true;
 		}
 		
@@ -173,10 +177,15 @@ split
 		if (vars.stage_no == 3 && vars.hidden_boss.Current == 0x2EE)
 			vars.flag_hidden_boss = true;
 	}
-		
 	
-	if (false && vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed)
-		return true;
+	if (vars.route == 12 && vars.stage_no == 5){
+		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+			vars.counter_for_lost_control += 1;
+			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			if (vars.counter_for_lost_control == 5)
+				return true;
+		}
+	}
 }
 
 reset

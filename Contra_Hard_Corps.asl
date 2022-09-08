@@ -5,6 +5,11 @@ state("game")
 	byte us_or_jp : 0x01BAA5F8, 0x74, 0xA8, 0x2F8, 0x18, 0x208, 0x58, 0x138;
 }
 
+startup
+{
+	settings.Add("allending", false, "100%");
+}
+
 init
 {
     vars.is_got_address = false;
@@ -24,6 +29,7 @@ init
 	vars.stage_no = 1;
 	vars.route = 0;
 	vars.counter_for_lost_control = 0;
+	vars.all_stages_clear = false;
 }
 
 update
@@ -142,12 +148,26 @@ start
 		vars.route = 0;
 		vars.counter_for_lost_control = 0;
 		vars.is_selecting = false;
+		vars.all_stages_clear = false;
 		return true;
 	}
 }
 
 split
 {
+	if (vars.all_stages_clear){
+		if (vars.flag_start != null && vars.flag_start.Current != 0xA0 && vars.flag_start.Current != 0x00 && vars.flag_start.Old == 0xA0){ //MAN
+			vars.flag_hidden_boss = false;
+			vars.ticks = System.DateTime.Now.Ticks / 10000000 + 4;
+			vars.stage_no = 1;
+			vars.route = 0;
+			vars.counter_for_lost_control = 0;
+			vars.is_selecting = false;
+			vars.all_stages_clear = false;
+		}
+		return false;
+	}
+	
 	if (vars.stage_clear != null){
 		if (vars.stage_clear.Changed && vars.stage_clear.Current == 1 && vars.ticks < (System.DateTime.Now.Ticks / 10000000)){
 			vars.stage_no += 1;
@@ -163,11 +183,11 @@ split
 	
 	if (vars.stage_no == 3 && vars.hidden_boss != null){ //Hidden End
 		if (vars.flag_hidden_boss && vars.hidden_boss.Current == 0 && vars.hidden_boss.Changed){
-			vars.flag_hidden_boss = false;
+			vars.all_stages_clear = true && settings["allending"];
 			return true;
 		}
 			
-		if (vars.hidden_boss.Current == 0x2EE)
+		if (vars.hidden_boss.Current == 0x2EE && vars.hidden_boss.Current > vars.hidden_boss.Old)
 			vars.flag_hidden_boss = true;
 	}
 	
@@ -175,37 +195,37 @@ split
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 			vars.counter_for_lost_control += 1;
 			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
-			if (vars.counter_for_lost_control == 2)
+			if (vars.counter_for_lost_control == 2){
+				vars.all_stages_clear = true && settings["allending"];
 				return true;
+			}
 		}
 		
 	}else if (vars.route == 12 && vars.stage_no == 5){ // Chase/Surrender
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 			vars.counter_for_lost_control += 1;
 			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
-			if (vars.counter_for_lost_control == 5)
+			if (vars.counter_for_lost_control == 5){
+				vars.all_stages_clear = true && settings["allending"];
 				return true;
+			}
 		}
-	}else if (vars.route == 21 && vars.stage_no == 7){ // Lab/Fight
-		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
-			vars.counter_for_lost_control += 1;
-			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
-			if (vars.counter_for_lost_control == 5)
-				return true;
-		}
-		
-	}else if (vars.route == 22 && vars.stage_no == 6){ // Lab/Surrender
-		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
-			vars.counter_for_lost_control += 1;
-			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
-			if (vars.counter_for_lost_control == 7)
-				return true;
+	}else if (vars.route == 22){ // Lab/Fight
+		if (vars.stage_no == 7 || vars.stage_no == 6){ // Lab/Fight or Lab/Surrender 4:test
+			if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+				vars.counter_for_lost_control += 1;
+				print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+				if (vars.counter_for_lost_control == (vars.stage_no == 6 ? 7 : 4)){
+					vars.all_stages_clear = true && settings["allending"];
+					return true;
+				}
+			}
 		}
 	}
 }
 
 reset
 {
-	if (vars.flag_rest != null && vars.flag_rest.Current == 0x8124)
+	if (!settings["allending"] && vars.flag_rest != null && vars.flag_rest.Current == 0x8124)
 		return true;
 }

@@ -7,7 +7,6 @@ state("game")
 
 init
 {
-    vars.is_searching = false;
     vars.is_got_address = false;
 	
 	vars.flag_start = null;
@@ -33,51 +32,44 @@ update
 		vars.is_got_address = false;
 	
 	if (!vars.is_got_address){
-		if (!vars.is_searching){
-			//vars.threadScan = new Thread(() =>
-			//{
-				vars.is_searching = true;
-				byte flag_load = 0;
-				IntPtr ptr = IntPtr.Zero;
-				print("------------Search start------------");
-				foreach (var page in game.MemoryPages()) {
-					var scanner = new SignatureScanner(game, page.BaseAddress, (int)page.RegionSize);
+		byte flag_load = 0;
+		IntPtr ptr = IntPtr.Zero;
+		print("------------Search start------------");
+		foreach (var page in game.MemoryPages()) {
+			var scanner = new SignatureScanner(game, page.BaseAddress, (int)page.RegionSize);
 
-					var sig_state = new SigScanTarget(0x0, //0x188, 
-						"?0 ?0 8D ?0 10 40 8D 20");
-						//20 10 8D 40 10 40 8D 20
-					ptr = scanner.Scan(sig_state);
+			var sig_state = new SigScanTarget(0x0, //0x188, 
+				"?0 ?0 8D ?0 10 40 8D 20");
+				//20 10 8D 40 10 40 8D 20
+			ptr = scanner.Scan(sig_state);
 
-					if (ptr != IntPtr.Zero){
-						if (flag_load < 0){
-							ptr = IntPtr.Zero;
-							flag_load += 1;
-						}
-						else{
-							print("Scaner found the pointer: " + ptr.ToString("x"));
-							vars.is_got_address = true;
-							vars.flag_start = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x16E));//0x16E MAN 0x169 KUAI 0x172 Y zuobiao 0x173 ??
-							vars.flag_rest = new MemoryWatcher<ushort>(new DeepPointer(ptr - 0x572));
-							vars.stage_clear = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x13));//0x11
-							vars.is_talking = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x59));
-							
-							vars.select_idx = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6A));
-							vars.flag_select = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6D));
-							
-							vars.lost_control = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x68));
-							vars.hidden_boss = new MemoryWatcher<short>(new DeepPointer(ptr + 0xFC6));
-							
-							break;
-						}
-					}
+			if (ptr != IntPtr.Zero){
+				if (flag_load < 0){
+					ptr = IntPtr.Zero;
+					flag_load += 1;
 				}
-				if (ptr == IntPtr.Zero)
-					print("Scaner found no pointer");
-				print("------------Search end------------");
-				vars.is_searching = false;
-			//});
-			//vars.threadScan.Start();
+				else{
+					print("Scaner found the pointer: " + ptr.ToString("x"));
+					vars.is_got_address = true;
+					vars.flag_start = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x16E));//0x16E MAN 0x169 KUAI 0x172 Y zuobiao 0x173 ??
+					vars.flag_rest = new MemoryWatcher<ushort>(new DeepPointer(ptr + 0x39C));
+					vars.stage_clear = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x13));//0x11
+					vars.is_talking = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x59));
+					
+					vars.select_idx = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6A));
+					vars.flag_select = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6D));
+					
+					vars.lost_control = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x68));
+					vars.hidden_boss = new MemoryWatcher<short>(new DeepPointer(ptr + 0xFC6));
+					
+					break;
+				}
+			}
 		}
+		if (ptr == IntPtr.Zero)
+			print("Scaner found no pointer");
+		print("------------Search end------------");
+		
 	}
 	else{
 		if (vars.stage_clear != null){
@@ -195,6 +187,12 @@ split
 				return true;
 		}
 	}else if (vars.route == 21 && vars.stage_no == 7){ // Lab/Fight
+		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+			vars.counter_for_lost_control += 1;
+			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			if (vars.counter_for_lost_control == 5)
+				return true;
+		}
 		
 	}else if (vars.route == 22 && vars.stage_no == 6){ // Lab/Surrender
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
@@ -208,6 +206,6 @@ split
 
 reset
 {
-	if (vars.flag_rest != null && vars.flag_rest.Current == 0xD000) //0xD000 or 0xD480
+	if (vars.flag_rest != null && vars.flag_rest.Current == 0x8124)
 		return true;
 }

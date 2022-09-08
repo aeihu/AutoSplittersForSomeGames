@@ -17,13 +17,11 @@ init
 	vars.flag_start = null;
 	vars.flag_rest = null;
 	vars.stage_clear = null;
-	vars.hidden_boss = null;
 	vars.select_idx = null;
 	vars.flag_select = null;
 	vars.lost_control = null;
 	vars.is_talking = null;
 	
-	vars.flag_hidden_boss = false;
 	vars.is_selecting = false;
 	vars.ticks = 0;
 	vars.stage_no = 1;
@@ -61,12 +59,9 @@ update
 					vars.flag_rest = new MemoryWatcher<ushort>(new DeepPointer(ptr + 0x39C));
 					vars.stage_clear = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x13));//0x11
 					vars.is_talking = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x59));
-					
 					vars.select_idx = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6A));
 					vars.flag_select = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x6D));
-					
 					vars.lost_control = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x68));
-					vars.hidden_boss = new MemoryWatcher<short>(new DeepPointer(ptr + 0xFC6));
 					
 					break;
 				}
@@ -92,12 +87,6 @@ update
 			vars.flag_start.Update(game);
 			//if (vars.flag_start.Changed)
 			//	print("flag_start: " + vars.flag_start.Current.ToString() + " - " + vars.flag_start.Old.ToString());
-		}
-		if (vars.hidden_boss != null){
-			vars.hidden_boss.Update(game);
-			if (vars.hidden_boss.Changed){
-				print("hidden_boss: " + vars.hidden_boss.Current.ToString() + " - " + vars.hidden_boss.Old.ToString());
-			}
 		}
 		if (vars.is_talking != null){
 			vars.is_talking.Update(game);
@@ -142,7 +131,6 @@ start
 	//if (vars.flag_start != null && vars.flag_start.Current == 0xC8 && vars.flag_start.Changed){ // Y zuobiao
 	//if (vars.flag_start != null && vars.flag_start.Current == 1 && vars.flag_start.Changed){ // Y ??
 	if (vars.flag_start != null && vars.flag_start.Current != 0xA0 && vars.flag_start.Current != 0x00 && vars.flag_start.Old == 0xA0){ //MAN
-		vars.flag_hidden_boss = false;
 		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 4;
 		vars.stage_no = 1;
 		vars.route = 0;
@@ -157,7 +145,6 @@ split
 {
 	if (vars.all_stages_clear){
 		if (vars.flag_start != null && vars.flag_start.Current != 0xA0 && vars.flag_start.Current != 0x00 && vars.flag_start.Old == 0xA0){ //MAN
-			vars.flag_hidden_boss = false;
 			vars.ticks = System.DateTime.Now.Ticks / 10000000 + 4;
 			vars.stage_no = 1;
 			vars.route = 0;
@@ -181,14 +168,18 @@ split
 		}
 	}
 	
-	if (vars.stage_no == 3 && vars.hidden_boss != null){ //Hidden End
-		if (vars.flag_hidden_boss && vars.hidden_boss.Current == 0 && vars.hidden_boss.Changed){
-			vars.all_stages_clear = true && settings["allending"];
-			return true;
-		}
-			
-		if (vars.hidden_boss.Current == 0x2EE && vars.hidden_boss.Current > vars.hidden_boss.Old)
-			vars.flag_hidden_boss = true;
+	if (vars.stage_no == 3){ //Hidden End
+		if (vars.route == 11 || vars.route == 21){
+			if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+				vars.counter_for_lost_control += 1;
+				print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+				if (vars.counter_for_lost_control == 4){
+					vars.all_stages_clear = true && settings["allending"];
+					return true;
+				}
+			}
+		}else if (vars.route == 12 || vars.route == 22)
+			vars.route -= 2;
 	}
 	
 	if (vars.route == 11 && vars.stage_no == 6){ // Chase/Fight

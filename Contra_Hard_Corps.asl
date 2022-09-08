@@ -1,7 +1,8 @@
 state("game")
 {
-	byte game_ui_selector : 0x01BAA228, 0x84, 0x34, 0x694, 0x20, 0x308, 0x58, 0xA8;
-	byte game_ui_layer_no : 0x01BAA228, 0x84, 0x34, 0x694, 0x20, 0x308, 0x58, 0x4;
+	byte game_ui_selector : 0x01BAB038, 0x14, 0x34, 0x694, 0x20, 0x308, 0x58, 0xA8;
+	byte game_ui_layer_no : 0x0078AA48, 0x14, 0x34, 0x9F0, 0x8, 0xBC, 0x38, 0x4;
+	byte us_or_jp : 0x01BAA5F8, 0x74, 0xA8, 0x2F8, 0x18, 0x208, 0x58, 0x138;
 }
 
 init
@@ -168,21 +169,38 @@ split
 		}
 	}
 	
-	if (vars.hidden_boss != null){
+	if (vars.stage_no == 3 && vars.hidden_boss != null){ //Hidden End
 		if (vars.flag_hidden_boss && vars.hidden_boss.Current == 0 && vars.hidden_boss.Changed){
 			vars.flag_hidden_boss = false;
 			return true;
 		}
 			
-		if (vars.stage_no == 3 && vars.hidden_boss.Current == 0x2EE)
+		if (vars.hidden_boss.Current == 0x2EE)
 			vars.flag_hidden_boss = true;
 	}
 	
-	if (vars.route == 12 && vars.stage_no == 5){
+	if (vars.route == 11 && vars.stage_no == 6){ // Chase/Fight
+		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+			vars.counter_for_lost_control += 1;
+			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			if (vars.counter_for_lost_control == 2)
+				return true;
+		}
+		
+	}else if (vars.route == 12 && vars.stage_no == 5){ // Chase/Surrender
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 			vars.counter_for_lost_control += 1;
 			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
 			if (vars.counter_for_lost_control == 5)
+				return true;
+		}
+	}else if (vars.route == 21 && vars.stage_no == 7){ // Lab/Fight
+		
+	}else if (vars.route == 22 && vars.stage_no == 6){ // Lab/Surrender
+		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
+			vars.counter_for_lost_control += 1;
+			print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			if (vars.counter_for_lost_control == 7)
 				return true;
 		}
 	}

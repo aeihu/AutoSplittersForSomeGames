@@ -1,7 +1,7 @@
 state("game")
 {
 	byte game_ui_selector : 0x01BAB038, 0x14, 0x34, 0x694, 0x20, 0x308, 0x58, 0xA8;
-	byte game_ui_layer_no : 0x0078AA48, 0x14, 0x34, 0x9F0, 0x8, 0xBC, 0x38, 0x4;
+	byte game_ui_layer_no : 0x01BAA158, 0x14, 0x34, 0x970, 0x38, 0x2C8, 0x58, 0x4;
 	byte us_or_jp : 0x01BAA5F8, 0x74, 0xA8, 0x2F8, 0x18, 0x208, 0x58, 0x138;
 }
 
@@ -24,6 +24,7 @@ init
 	
 	vars.is_selecting = false;
 	vars.ticks = 0;
+	vars.research_ticks = 0;
 	vars.stage_no = 1;
 	vars.route = 0;
 	vars.counter_for_lost_control = 0;
@@ -32,10 +33,12 @@ init
 
 update
 {
-	if (current.game_ui_layer_no == 5 && old.game_ui_layer_no == 4)
+	if (current.game_ui_layer_no == 5 && old.game_ui_layer_no == 4){
 		vars.is_got_address = false;
+		vars.research_ticks = System.DateTime.Now.Ticks / 10000000 + 5;
+	}
 	
-	if (!vars.is_got_address){
+	if (!vars.is_got_address && vars.research_ticks < (System.DateTime.Now.Ticks / 10000000)){
 		byte flag_load = 0;
 		IntPtr ptr = IntPtr.Zero;
 		print("------------Search start------------");

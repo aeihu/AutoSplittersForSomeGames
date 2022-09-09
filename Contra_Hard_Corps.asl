@@ -78,47 +78,63 @@ update
 	else{
 		if (vars.stage_clear != null){
 			vars.stage_clear.Update(game);
+			//------------debug info--------------
 			//if (vars.stage_clear.Changed)
 			//	print("stage_clear: " + vars.stage_clear.Current.ToString() + " - " + vars.stage_clear.Old.ToString());
+			//------------------------------------
 		}
 		if (vars.flag_rest != null){
 			vars.flag_rest.Update(game);
+			//------------debug info--------------
 			//if (vars.flag_rest.Changed)
 			//	print("flag_rest: " + vars.flag_rest.Current.ToString("x") + " - " + vars.flag_rest.Old.ToString("x"));
+			//------------------------------------
 		}
 		if (vars.flag_start != null){
 			vars.flag_start.Update(game);
+			//------------debug info--------------
 			//if (vars.flag_start.Changed)
 			//	print("flag_start: " + vars.flag_start.Current.ToString() + " - " + vars.flag_start.Old.ToString());
+			//------------------------------------
 		}
 		if (vars.is_talking != null){
 			vars.is_talking.Update(game);
+			//------------debug info--------------
 			//if (vars.is_talking.Changed)
 			//	print("is_talking: " + vars.is_talking.Current.ToString() + " - " + vars.is_talking.Old.ToString());
+			//------------------------------------
 		}
 		if (vars.lost_control != null){
 			vars.lost_control.Update(game);
+			//------------debug info--------------
 			//if (vars.lost_control.Changed)
-			//	print("lost_control: " + vars.lost_control.Current.ToString() + " - " + vars.lost_control.Old.ToString());
+				//print("lost_control: " + vars.lost_control.Current.ToString() + " - " + vars.lost_control.Old.ToString());
+			//------------------------------------
 		}
 		if (vars.select_idx != null){
 			vars.select_idx.Update(game);
+			//------------debug info--------------
 			//if (vars.select_idx.Changed)
 			//	print("select_idx: " + vars.select_idx.Current.ToString() + " - " + vars.select_idx.Old.ToString());
+			//------------------------------------
 		}
 		if (vars.flag_select != null){
 			vars.flag_select.Update(game);
-			//if (vars.flag_select.Changed){
-			//	if (vars.flag_select.Current == 3)
-			//		vars.is_selecting = true;
+			if (vars.flag_select.Changed){
+				if (vars.flag_select.Current == 3)
+					vars.is_selecting = true;
+			//------------debug info--------------
 			//	print("flag_select: " + vars.flag_select.Current.ToString() + " - " + vars.flag_select.Old.ToString());
-			//}
+			//------------------------------------
+			}
 		}
 		
 		if (vars.is_selecting){
 			if ((vars.flag_select.Changed && vars.flag_select.Current == 1) || (vars.is_talking.Changed && vars.is_talking.Current == 0)){
 				vars.route += (vars.route == 0 ? 10 : 1) * (vars.select_idx.Current + 1);
+				//------------debug info--------------
 				//print("route: " + vars.route.ToString());
+				//------------------------------------
 				vars.is_selecting = false;
 			}
 		}
@@ -158,7 +174,9 @@ split
 	if (vars.stage_clear != null){
 		if (vars.stage_clear.Changed && vars.stage_clear.Current == 1 && vars.ticks < (System.DateTime.Now.Ticks / 10000000)){
 			vars.stage_no += 1;
+			//------------debug info--------------
 			//print("stage_no: " + vars.stage_no.ToString());
+			//------------------------------------
 			return true;
 		}
 		
@@ -172,7 +190,9 @@ split
 		if (vars.route == 11 || vars.route == 21){
 			if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 				vars.counter_for_lost_control += 1;
+				//------------debug info--------------
 				//print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+				//------------------------------------
 				if (vars.counter_for_lost_control == 4){
 					vars.all_stages_clear = true && settings["allending"];
 					return true;
@@ -185,7 +205,9 @@ split
 	if (vars.route == 11 && vars.stage_no == 6){ // Chase/Fight
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 			vars.counter_for_lost_control += 1;
+			//------------debug info--------------
 			//print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			//------------------------------------
 			if (vars.counter_for_lost_control == 2){
 				vars.all_stages_clear = true && settings["allending"];
 				return true;
@@ -195,7 +217,9 @@ split
 	}else if (vars.route == 12 && vars.stage_no == 5){ // Chase/Surrender
 		if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 			vars.counter_for_lost_control += 1;
+			//------------debug info--------------
 			//print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+			//------------------------------------
 			if (vars.counter_for_lost_control == 5){
 				vars.all_stages_clear = true && settings["allending"];
 				return true;
@@ -205,7 +229,9 @@ split
 		if (vars.stage_no == 7 || vars.stage_no == 6){ // Lab/Fight or Lab/Surrender 4:test
 			if (vars.lost_control != null && vars.lost_control.Current == 1 && vars.lost_control.Changed){
 				vars.counter_for_lost_control += 1;
+				//------------debug info--------------
 				//print("counter_for_lost_control: " + vars.counter_for_lost_control.ToString());
+				//------------------------------------
 				if (vars.counter_for_lost_control == (vars.stage_no == 6 ? 7 : 4)){
 					vars.all_stages_clear = true && settings["allending"];
 					return true;

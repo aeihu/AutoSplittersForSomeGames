@@ -1,11 +1,22 @@
 state("MiniMetro")
 {
     //int main : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0;
-	int menu_option : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0x38;
-	int menucity_game : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0x10, 0x28;
-	bool menucity_game_isin : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0x10, 0x28, 0xC, 0x7D;
-	int game_score : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0x54, 0x10;
-	int game_state : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0xC8;
+	//int menu_option : "UnityPlayer.dll", 0x014390C8, 0x30, 0x44, 0x60, 0x3C, 0x68, 0x38, 0x0, 0x1C, 0x8, 0x38;
+	
+	//Main<Main>.controller<GameController>.game<Game>
+	//int main_game : "UnityPlayer.dll", 0x0061ED88, 0x18, 0x1F0, 0xC, 0x18, 0xC, 0x8C, 0x410, 0x8;
+	
+	//Main<Main>.controller<GameController>.game<Game>.city<City>.isInTransition<bool>
+	bool main_game_isin : "UnityPlayer.dll", 0x0061ED88, 0x18, 0x1F0, 0xC, 0x18, 0xC, 0x8C, 0x410, 0x8, 0xC, 0x7D;
+	
+	//Main<Main>.controller<GameController>.menu<Menu>.city<MenuCity>.game<Game>
+	int menucity_game : "UnityPlayer.dll", 0x0061ED88, 0x18, 0x1F0, 0xC, 0x18, 0xC, 0x8C, 0x410, 0x8, 0x10, 0x28;
+	
+	//Main<Main>.controller<GameController>.game<Game>.scoreController<ScoreController>.score<int>
+	int game_score : "UnityPlayer.dll", 0x0061ED88, 0x18, 0x1F0, 0xC, 0x18, 0xC, 0x8C, 0x410, 0x8, 0x54, 0x10;
+	
+	//Main<Main>.controller<GameController>.game<Game>.currentScreen<GameScreen>
+	int game_state : "UnityPlayer.dll", 0x0061ED88, 0x18, 0x1F0, 0xC, 0x18, 0xC, 0x8C, 0x410, 0x8, 0xC8;
 }
 
 startup
@@ -21,14 +32,17 @@ startup
 
 init
 {
+	vars.flag_rest = false;
 	vars.flag = false;
 	vars.times = 1;
 	vars.per = 0;
+	vars.ticks = 0;
 }
 
 start
 {
-	if (current.menucity_game != old.menucity_game && current.menucity_game_isin != old.menucity_game_isin && current.menucity_game_isin && (current.menu_option == 2 || current.menu_option == 12)){
+	if (current.menucity_game != old.menucity_game && current.menucity_game != 0 && vars.ticks < System.DateTime.Now.Ticks / 10000000){
+		vars.flag_rest = false;
 		vars.flag = false;
 		vars.times = 1;
 		vars.per = 0;
@@ -94,11 +108,16 @@ split
 			vars.flag = true;
 		}
 	}
+	
+	if (!vars.flag_rest)
+		if (current.menucity_game != old.menucity_game && current.menucity_game == 0)
+			vars.flag_rest = true;
 }
 
 reset
 {
-	if (current.menu_option == 2 && current.menucity_game_isin != old.menucity_game_isin && !current.menucity_game_isin){
+	if (vars.flag_rest && current.menucity_game != old.menucity_game){
+		vars.ticks = System.DateTime.Now.Ticks / 10000000 + 1;
 		return true;
 	}
 }
